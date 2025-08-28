@@ -1,0 +1,17 @@
+A Pod Disruption Budget is created by an application owner for each application. A PDB limits the number pods of a repliated application that are down from voluntary disruptions. 
+Ex: An application in created in a deployment wih 5 replicase and the client wants the application to have servicng load never falls below a certain percentage, thus a PDB is created along with the deployment to ensure that the application always run even when the cluster/ node fails.
+
+There are certain cases with which the pods are affected including:
+1. A hardware failure of the physical machine backinng thee node.
+2. A cluster administartor deletes the VM(instance) by mistake.
+3. A kernel Panic.
+4. Node disappears from the cluster due to cluster network partition.
+5. A cloud provider or hypervisor failure makes VM disappear.
+
+Voluntary disruptions:
+1. Deleting the deployment that manges the pod.
+2. Updatig a deployment ppod tempalte causing a restart
+3. Directly deleting the pod.
+
+Cluster Administartor actions include:
+
