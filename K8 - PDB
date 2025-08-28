@@ -14,4 +14,8 @@ Voluntary disruptions:
 3. Directly deleting the pod.
 
 Cluster Administartor actions include:
+1. Draining a  node for repair or upgrade.
+2. Draining a node from a cluster to scale the cluster down.
+3. Removig a pod ffrom a node to permit something else to fit on that node.
+
 
