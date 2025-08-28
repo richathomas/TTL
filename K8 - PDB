@@ -19,3 +19,92 @@ Cluster Administartor actions include:
 3. Removig a pod ffrom a node to permit something else to fit on that node.
 
 
+
+Scenario:
+
+
+Deployment has 4 pods.
+
+A PodDisruptionBudget (PDB) is set with minAvailable = 2.
+
+You drain a node due to upgrade/hardware failure.
+
+Before drain: 4 pods running.
+
+After drain: 2 pods are running on healthy nodes, 2 are in Pending (unschedulable).
+
+The drained node still has 2 pods stuck because of the PDB.
+
+Why this happens
+
+The PDB ensures at least 2 pods remain available at all times.
+
+When you drain, Kubernetes tries to evict pods.
+
+Since only 2 pods are running (and 2 are Pending), evicting more would drop below the minAvailable=2.
+
+So eviction is blocked → the 2 pods stay on the draining node.
+
+Troubleshooting Approach
+1. Check the PDB status
+kubectl get pdb
+kubectl describe pdb <pdb-name>
+
+
+Look for:
+
+Allowed disruptions (should be 0 in this case).
+
+Current healthy vs Min available.
+This confirms PDB is blocking eviction.
+
+2. Check why the pending pods are not scheduling
+kubectl describe pod <pending-pod-name>
+
+
+Look for:
+
+Node affinity/taints/tolerations mismatch.
+
+Resource requests (CPU/memory too high for remaining nodes).
+
+Storage class / PVC binding issues.
+
+3. Temporary Solutions
+
+Option A: Add capacity
+
+If you add a new node (or scale node pool in EKS/GKE/AKS), the Pending pods can be scheduled.
+
+Once they’re Running, eviction will succeed on the drained node.
+
+Option B: Adjust PDB (if acceptable)
+
+Lower minAvailable temporarily to allow disruption.
+
+kubectl edit pdb <pdb-name>
+
+
+Example: set minAvailable: 1.
+
+This will let eviction proceed.
+
+⚠️ Risk: app may briefly run below desired availability.
+
+Option C: Force eviction (last resort)
+
+kubectl drain <node-name> --ignore-pdb
+
+
+⚠️ This overrides the PDB completely → might cause downtime.
+
+4. Long-term Fix
+
+Ensure enough cluster capacity so that when one node goes down, the remaining nodes can handle all pods.
+
+Revisit PDB settings: sometimes minAvailable=2 is too strict if the cluster is small. Using maxUnavailable can be more flexible.
+
+Use Cluster Autoscaler → so Pending pods automatically trigger new nodes to be added.
+
+✅ In short:
+The pods remain on the drained node because the PDB is blocking eviction. Troubleshoot why the other pods are Pending (usually resources/constraints). Then either add capacity, adjust the PDB, or override it depending on urgency.
