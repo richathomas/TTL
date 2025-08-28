@@ -1,4 +1,4 @@
-###follow below steps to replicate - to know more about PodDisruptionBudget refer -
+##follow below steps to replicate - to know more about PodDisruptionBudget refer -
 
 ##kubectl get all
 ```bash
@@ -60,10 +60,14 @@ pod/nginx-deploy-598b589c46-x7xmf   1/1     Running   0          82s
 ```bash
 kubectl uncordon kube-node-1
 node/kube-node-1 uncordoned
+```
+```bash
 kubectl get nodes
 NAME          STATUS   ROLES                  AGE   VERSION
 kube-master   Ready    control-plane,master   20d   v1.20.1
 kube-node-1   Ready    <none>                 20d   v1.20.1
+```
+```bash
 kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 nginx-deploy-598b589c46-4p4gj   1/1     Running   0          2m25s
