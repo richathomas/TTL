@@ -1,4 +1,4 @@
-##follow below steps to replicate - to know more about PodDisruptionBudget refer -
+##follow below steps to replicate - to know more about PodDisruptionBudget refer
 
 ##kubectl get all
 ```bash
